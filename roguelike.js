@@ -6,9 +6,38 @@ function getRandomInt(min, max) {
     return Math.round(Math.random() * (max - min)) + min;
 }
 
-function removeWall (x,y) {
+function removeWall (x, y) {
     GameData[y][x] = "R";
     document.getElementById(`${x}-${y}`).classList.remove('tileW');
+}
+
+function removeUnit (x, y) {
+    const unitType = GameData[y][x]
+    GameData[y][x] = "R";
+    const objectData = objectProps.find(x => x.tileValue === unitType);
+    document.getElementById(`${x}-${y}`).classList.remove(objectData.tileClass);
+}
+
+function spawnUnit (x, y, type) {
+    GameData[y][x] = type;
+    const objectData = objectProps.find(x => x.tileValue === type);
+    document.getElementById(`${x}-${y}`).classList.add(objectData.tileClass);
+}
+
+function getCoordinates (type, index) {
+    if (!index) index = 0;
+
+    let indexes = [], i = -1;
+    let arr = GameData.flat();
+
+    while ((i = arr.indexOf(type, i+1)) != -1){
+        indexes.push(i)
+    }
+
+    return {
+        x: Math.floor(indexes[index] / 40),
+        y: indexes[index] % 40
+    }
 }
 
 //CONFIG
@@ -38,6 +67,8 @@ const objectProps = [
         amount: 2
     }
 ]
+
+//Генераторы и отрисовка
 
 function GenerateTiles () {
     for (let iy = 0; iy <= 23; iy++) {
@@ -115,8 +146,12 @@ function PlaceGoods (objectProps) {
     });
 }
 
+//Перемещения
+function movePlayer (){
+
+}
+
 GenerateTiles();
 GenerateRooms();
 GeneratePasses();
 PlaceGoods (objectProps);
-console.table(GameData);
