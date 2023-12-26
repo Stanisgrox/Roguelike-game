@@ -1,45 +1,6 @@
 const GameData = [];
 const GameField = document.getElementsByClassName('field')[0];
 
-//UTILITY FUNCTIONS
-function getRandomInt(min, max) {
-    return Math.round(Math.random() * (max - min)) + min;
-}
-
-function removeWall (x, y) {
-    GameData[y][x] = "R";
-    document.getElementById(`${x}-${y}`).classList.remove('tileW');
-}
-
-function removeUnit (x, y) {
-    const unitType = GameData[y][x]
-    GameData[y][x] = "R";
-    const objectData = objectProps.find(x => x.tileValue === unitType);
-    document.getElementById(`${x}-${y}`).classList.remove(objectData.tileClass);
-}
-
-function spawnUnit (x, y, type) {
-    GameData[y][x] = type;
-    const objectData = objectProps.find(x => x.tileValue === type);
-    document.getElementById(`${x}-${y}`).classList.add(objectData.tileClass);
-}
-
-function getCoordinates (type, index) {
-    if (!index) index = 0;
-
-    let indexes = [], i = -1;
-    let arr = GameData.flat();
-
-    while ((i = arr.indexOf(type, i+1)) != -1){
-        indexes.push(i)
-    }
-
-    return {
-        x: Math.floor(indexes[index] / 40),
-        y: indexes[index] % 40
-    }
-}
-
 //CONFIG
 const objectProps = [
     {
@@ -67,6 +28,43 @@ const objectProps = [
         amount: 2
     }
 ]
+
+//UTILITY FUNCTIONS
+function getRandomInt(min, max) {
+    return Math.round(Math.random() * (max - min)) + min;
+}
+
+function removeWall (x, y) {
+    GameData[y][x] = "R";
+    document.getElementById(`${x}-${y}`).classList.remove('tileW');
+}
+
+function removeUnit (x, y, typeClass) {
+    GameData[y][x] = "R";
+    document.getElementById(`${x}-${y}`).classList.remove(typeClass);
+}
+
+function spawnUnit (x, y, type) {
+    GameData[y][x] = type;
+    const objectData = objectProps.find(x => x.tileValue === type);
+    document.getElementById(`${x}-${y}`).classList.add(objectData.tileClass);
+}
+
+function getCoordinates (type, index) {
+    if (!index) index = 0;
+
+    let indexes = [], i = -1;
+    let arr = GameData.flat();
+
+    while ((i = arr.indexOf(type, i+1)) != -1){
+        indexes.push(i)
+    }
+
+    return {
+        x: Math.floor(indexes[index] / 40),
+        y: indexes[index] % 40
+    }
+}
 
 //Генераторы и отрисовка
 
@@ -147,7 +145,26 @@ function PlaceGoods (objectProps) {
 }
 
 //Перемещения
-function movePlayer (){
+function MovePlayer (direction) {
+    let shift = {x: 0, y: 0}
+    let coords = getCoordinates('P');
+    console.log (coords);
+    switch (direction) {
+        case 'up': 
+            shift.y = 1;
+        break;
+        case 'down':
+            shift.y = -1;
+        break;
+        case 'left':
+            shift.x = -1;
+        break;
+        case 'right':
+            shift.x = 1;
+        break;
+    }
+    removeUnit(coords.x, coords.y, 'tileP');
+    spawnUnit(coords.x + shift.x, coords.y + shift.y, 'P');
 
 }
 
@@ -155,3 +172,7 @@ GenerateTiles();
 GenerateRooms();
 GeneratePasses();
 PlaceGoods (objectProps);
+
+document.addEventListener('click', (e) => {
+    MovePlayer('left')
+})
