@@ -61,8 +61,8 @@ function getCoordinates (type, index) {
     }
 
     return {
-        x: Math.floor(indexes[index] / 40),
-        y: indexes[index] % 40
+        x: indexes[index] % 40,
+        y: Math.floor(indexes[index] / 40)
     }
 }
 
@@ -148,13 +148,12 @@ function PlaceGoods (objectProps) {
 function MovePlayer (direction) {
     let shift = {x: 0, y: 0}
     let coords = getCoordinates('P');
-    console.log (coords);
     switch (direction) {
         case 'up': 
-            shift.y = 1;
+            shift.y = -1;
         break;
         case 'down':
-            shift.y = -1;
+            shift.y = 1;
         break;
         case 'left':
             shift.x = -1;
@@ -165,7 +164,6 @@ function MovePlayer (direction) {
     }
     removeUnit(coords.x, coords.y, 'tileP');
     spawnUnit(coords.x + shift.x, coords.y + shift.y, 'P');
-
 }
 
 GenerateTiles();
@@ -173,6 +171,19 @@ GenerateRooms();
 GeneratePasses();
 PlaceGoods (objectProps);
 
-document.addEventListener('click', (e) => {
-    MovePlayer('left')
+document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+        case 'w':
+            MovePlayer('up');
+        break;
+        case 's':
+            MovePlayer('down');
+        break;
+        case 'd':
+            MovePlayer('right');
+        break;
+        case 'a':
+            MovePlayer('left');
+        break
+    }
 })
