@@ -56,7 +56,7 @@ function getCoordinates (type, index) {
     let indexes = [], i = -1;
     let arr = GameData.flat();
 
-    while ((i = arr.indexOf(type, i+1)) != -1){
+    while ((i = arr.indexOf(type, i + 1)) != -1){
         indexes.push(i)
     }
 
@@ -162,8 +162,14 @@ function MovePlayer (direction) {
             shift.x = 1;
         break;
     }
+    let newCoords = {x: coords.x + shift.x, y: coords.y + shift.y};
+    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x] === 'E') return;
+    if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
+        const objectData = objectProps.find(x => x.tileValue === GameData[newCoords.y][newCoords.x]);
+        removeUnit(newCoords.x, newCoords.y, objectData.tileClass);
+    }
     removeUnit(coords.x, coords.y, 'tileP');
-    spawnUnit(coords.x + shift.x, coords.y + shift.y, 'P');
+    spawnUnit(newCoords.x, newCoords.y, 'P');
 }
 
 GenerateTiles();
