@@ -1,3 +1,6 @@
+const GameData = [];
+const GameField = document.getElementsByClassName('field')[0];
+
 //UTILITY FUNCTIONS
 function getRandomInt(min, max) {
     return Math.round(Math.random() * (max - min)) + min;
@@ -30,9 +33,6 @@ const objectProps = [
         amount: 2
     }
 ]
-
-const GameData = [];
-const GameField = document.getElementsByClassName('field')[0];
 
 function GenerateTiles () {
     for (let iy = 0; iy <= 23; iy++) {
