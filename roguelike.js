@@ -6,6 +6,11 @@ function getRandomInt(min, max) {
     return Math.round(Math.random() * (max - min)) + min;
 }
 
+function removeWall (x,y) {
+    GameData[y][x] = "R";
+    document.getElementById(`${x}-${y}`).classList.remove('tileW');
+}
+
 //CONFIG
 const objectProps = [
     {
@@ -60,9 +65,7 @@ function GenerateRooms () {
             for (let ix = 0; ix <= 39; ix++){
                 if (ix >= roomCoordinates.x && ix <= roomCoordinates.x + roomDimensions.x){
                     if (iy >= roomCoordinates.y && iy <= roomCoordinates.y + roomDimensions.y) {
-                        GameData[iy][ix] = "R";
-                        const tile = document.getElementById(`${ix}-${iy}`);
-                        tile.classList.remove('tileW')
+                        removeWall(ix, iy)
                     }
                 }
             }
@@ -81,9 +84,7 @@ function GeneratePasses () {
         }
         passessCoord.push(coordinate);
         for (let iy = 0; iy <= 23; iy++) {
-            GameData[iy][coordinate] = "R";
-            const tile = document.getElementById(`${coordinate}-${iy}`);
-            tile.classList.remove('tileW');
+            removeWall(coordinate, iy)
         }
     }
     passessCoord = [];
@@ -94,9 +95,7 @@ function GeneratePasses () {
         }
         passessCoord.push(coordinate);
         for (let ix = 0; ix <= 39; ix++) {
-            GameData[coordinate][ix] = "R";
-            const tile = document.getElementById(`${ix}-${coordinate}`);
-            tile.classList.remove('tileW');
+            removeWall(ix, coordinate)
         }
     }
 }
