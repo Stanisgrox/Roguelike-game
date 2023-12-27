@@ -1,4 +1,6 @@
 const GameData = [];
+const Player = {};
+const Enemies = [];
 const GameField = document.getElementsByClassName('field')[0];
 
 //CONFIG
@@ -39,15 +41,26 @@ function removeWall (x, y) {
     document.getElementById(`${x}-${y}`).classList.remove('tileW');
 }
 
-function removeUnit (x, y, typeClass) {
+function removeUnit (x, y) {
+    const prevTile = GameData[y][x];
+    if (prevTile === "R" || prevTile === "W") return;
     GameData[y][x] = "R";
-    document.getElementById(`${x}-${y}`).classList.remove(typeClass);
+    const objectData = objectProps.find(x => x.tileValue === prevTile);
+    document.getElementById(`${x}-${y}`).classList.remove(objectData.tileClass);
+
+    if (objectData.tileClass === 'tileE') {
+        document.getElementById(`${x}-${y}`).removeAttribute('enemy-id')
+    }
 }
 
-function spawnUnit (x, y, type) {
+function spawnUnit (x, y, type, id) {
     GameData[y][x] = type;
     const objectData = objectProps.find(x => x.tileValue === type);
     document.getElementById(`${x}-${y}`).classList.add(objectData.tileClass);
+
+    if (type === 'E' && id) {
+        document.getElementById(`${x}-${y}`).setAttribute('enemy-id', id)
+    }
 }
 
 function getCoordinates (type, index) {
@@ -140,6 +153,16 @@ function PlaceGoods (objectProps) {
             }
             GameData[y][x] = element.tileValue;
             document.getElementById(`${x}-${y}`).classList.add(element.tileClass);
+
+            if (element.tileValue === 'E') {
+                Enemies.push({
+                    hp: 10,
+                    id: i,
+                    direction: undefined,
+                    turns: 0
+                });
+                document.getElementById(`${x}-${y}`).setAttribute('enemy-id', i)
+            }
         }
     });
 }
@@ -163,12 +186,12 @@ function MovePlayer (direction) {
         break;
     }
     let newCoords = {x: coords.x + shift.x, y: coords.y + shift.y};
+    if ((newCoords.x > 39 || newCoords.x <0) || (newCoords.y > 23 || newCoords.y < 0)) return;
     if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x] === 'E') return;
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
-        const objectData = objectProps.find(x => x.tileValue === GameData[newCoords.y][newCoords.x]);
-        removeUnit(newCoords.x, newCoords.y, objectData.tileClass);
+        removeUnit(newCoords.x, newCoords.y);
     }
-    removeUnit(coords.x, coords.y, 'tileP');
+    removeUnit(coords.x, coords.y);
     spawnUnit(newCoords.x, newCoords.y, 'P');
 }
 
@@ -177,19 +200,30 @@ GenerateRooms();
 GeneratePasses();
 PlaceGoods (objectProps);
 
+
 document.addEventListener('keydown', (e) => {
-    switch (e.key) {
-        case 'w':
+    switch (e.code) {
+        case 'KeyW':
             MovePlayer('up');
         break;
-        case 's':
+        case 'KeyS':
             MovePlayer('down');
         break;
-        case 'd':
+        case 'KeyD':
             MovePlayer('right');
         break;
-        case 'a':
+        case 'KeyA':
             MovePlayer('left');
         break
+        case 'Space':
+            console.log('attack');
+        break;
     }
+    console.log(Enemies)
+})
+
+document.addEventListener('click', (e) => {
+    let x = Number(e.target.id.split('-')[0]);
+    let y = Number(e.target.id.split('-')[1]);
+    removeUnit(x,y)
 })
