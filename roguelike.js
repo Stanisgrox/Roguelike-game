@@ -228,9 +228,20 @@ function MovePlayer (direction) {
     NewTile.appendChild(HPBar);
 }
 
-// Атака
-function attack () {
+// Атака и изменение характеристик
+function attack (initiator) {
+    let coordinates;
+    if (initiator === 'P') coordinates = getCoordinates('P');
 
+    for (let iy = coordinates.y - 1; iy <= coordinates.y + 1; iy ++) {
+        for (let ix = coordinates.x - 1; ix <= coordinates.x + 1; ix++) {
+            if (ix > FIELD_WIDTH || iy > FIELD_HEIGHT) continue;
+            const target = GameData[iy][ix];
+            if (target === initiator) continue;
+            if (target.charAt(0) != 'E' && target.charAt(0) != 'P') continue;
+            console.log(target);
+        }
+    }
 }
 
 GenerateTiles();
@@ -253,7 +264,7 @@ document.addEventListener('keydown', (e) => {
             MovePlayer('left');
         break
         case 'Space':
-            console.log('attack');
+            attack('P')
         break;
     }
 })
@@ -261,5 +272,5 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('click', (e) => {
     let x = Number(e.target.id.split('-')[0]);
     let y = Number(e.target.id.split('-')[1]);
-    removeUnit(x,y);
+    console.log(getCoordinates('P'));
 })
