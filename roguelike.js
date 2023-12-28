@@ -206,6 +206,7 @@ function Move (direction, unit) {
     let shift = {x: 0, y: 0}
     let coords = getCoordinates(unit);
     const id = unit.split('.')[1];
+    const type = unit.split('.')[0];
 
     switch (direction) {
         case 'up': 
@@ -223,12 +224,12 @@ function Move (direction, unit) {
     }
     let newCoords = {x: coords.x + shift.x, y: coords.y + shift.y};
     if ((newCoords.x > FIELD_WIDTH || newCoords.x <0) || (newCoords.y > FIELD_HEIGHT || newCoords.y < 0)) return false;
-    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E') return false;
+    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E' || GameData[newCoords.y][newCoords.x] === 'P') return false;
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
-        if (unit === 'P') removeUnit(newCoords.x, newCoords.y);
+        if (type === 'P') removeUnit(newCoords.x, newCoords.y);
     }
     const HPBar = removeUnit(coords.x, coords.y);
-    const NewTile = spawnUnit(newCoords.x, newCoords.y, unit, id);
+    const NewTile = spawnUnit(newCoords.x, newCoords.y, type, id);
     NewTile.appendChild(HPBar);
 }
 
@@ -250,6 +251,7 @@ function attack (initiator) {
 
     targets.forEach(target => HPChange(target, -1));
     if (targets.includes('P')) return true;
+    else return false;
 }
 
 function HPChange (target, amount) {
@@ -285,6 +287,7 @@ function gameLoop () {
 
     Enemies.forEach((enemy) => {
         attack(`E.${enemy.id}`);
+        //Move('right', `E.${enemy.id}`)
     });
 
     setTimeout(() => gameLoop(), 500);
