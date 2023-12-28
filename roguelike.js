@@ -4,7 +4,7 @@ const Player = {
     maxHP: 10,
     attack: 1
 };
-const Enemies = [];
+var Enemies = [];
 const GameField = document.getElementsByClassName('field')[0];
 
 //CONFIG
@@ -146,9 +146,9 @@ function GeneratePasses () {
     let passessCoord = [];
 
     for (let i = 1; i <= passesNumber.vertical; i++) {
-        let coordinate = getRandomInt(1,FIELD_WIDTH - 1);
+        let coordinate = getRandomInt(2,FIELD_WIDTH - 3);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
-            coordinate = getRandomInt(1,FIELD_WIDTH - 1)
+            coordinate = getRandomInt(2, FIELD_WIDTH - 3)
         }
         passessCoord.push(coordinate);
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++) {
@@ -157,9 +157,9 @@ function GeneratePasses () {
     }
     passessCoord = [];
     for (let i = 1; i <= passesNumber.horizontal; i++) {
-        let coordinate = getRandomInt(1, FIELD_HEIGHT - 1);
+        let coordinate = getRandomInt(2, FIELD_HEIGHT - 3);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
-            coordinate = getRandomInt(1,FIELD_HEIGHT - 1)
+            coordinate = getRandomInt(2, FIELD_HEIGHT - 3)
         }
         passessCoord.push(coordinate);
         for (let ix = 0; ix <= FIELD_WIDTH; ix++) {
@@ -230,17 +230,34 @@ function MovePlayer (direction) {
 
 // Атака и изменение характеристик
 function attack (initiator) {
-    let coordinates;
-    if (initiator === 'P') coordinates = getCoordinates('P');
+    const coordinates = getCoordinates(initiator);
+    const targets = [];
 
     for (let iy = coordinates.y - 1; iy <= coordinates.y + 1; iy ++) {
         for (let ix = coordinates.x - 1; ix <= coordinates.x + 1; ix++) {
             if (ix > FIELD_WIDTH || iy > FIELD_HEIGHT) continue;
             const target = GameData[iy][ix];
-            if (target === initiator) continue;
             if (target.charAt(0) != 'E' && target.charAt(0) != 'P') continue;
-            console.log(target);
+            if (target === initiator) continue;
+            if (initiator.charAt(0) === 'E' && target.charAt(0) === 'E') continue;
+            targets.push(target);
         }
+    }
+
+    targets.forEach(target => HPChange(target, -1));
+}
+
+function HPChange (target, amount) {
+    if (!target) return;
+    if (target.charAt(0) === 'E') id = target.split('.')[1];
+    const object = target === 'P'? Player : Enemies.filter((enemy) => enemy.id === Number(id))[0];
+
+    object.HP = object.HP + amount;
+
+    if (object.HP <= 0) {
+        Enemies = Enemies.filter((enemy) => enemy.id != id);
+        const unit = getCoordinates(target);
+        removeUnit(unit.x, unit.y);
     }
 }
 
@@ -272,5 +289,5 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('click', (e) => {
     let x = Number(e.target.id.split('-')[0]);
     let y = Number(e.target.id.split('-')[1]);
-    console.log(getCoordinates('P'));
+    console.log(getCoordinates('E.8'));
 })
