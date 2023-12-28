@@ -6,6 +6,7 @@ const Player = {
 };
 var Enemies = [];
 const GameField = document.getElementsByClassName('field')[0];
+var GameActive = true;
 
 //CONFIG
 const objectProps = [
@@ -128,7 +129,7 @@ function GenerateRooms () {
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
-        let roomCoordinates = {x: getRandomInt(0,FIELD_WIDTH - 3), y: getRandomInt(0,FIELD_HEIGHT - 3)}
+        let roomCoordinates = {x: getRandomInt(0, FIELD_WIDTH - roomDimensions.x), y: getRandomInt(0, FIELD_HEIGHT - roomDimensions.y)}
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
             for (let ix = 0; ix <= FIELD_WIDTH; ix++){
                 if (ix >= roomCoordinates.x && ix <= roomCoordinates.x + roomDimensions.x){
@@ -258,7 +259,13 @@ function HPChange (target, amount) {
     HPBar.style['width'] = `${object.HP / object.maxHP * 100}%`;
 
     if (object.HP <= 0) {
-        Enemies = Enemies.filter((enemy) => enemy.id != id);
+        if (target.charAt(0) === 'E') Enemies = Enemies.filter((enemy) => enemy.id != id);
+        if (target === 'P') {
+            const caption = document.getElementById('caption');
+            caption.innerHTML = 'Игра окончена';
+            caption.style['color'] = 'red';
+            GameActive = false;
+        }
         removeUnit(unit.x, unit.y);
     }
 }
@@ -292,4 +299,5 @@ document.addEventListener('click', (e) => {
     let x = Number(e.target.id.split('-')[0]);
     let y = Number(e.target.id.split('-')[1]);
     console.log(getCoordinates('E.8'));
+    HPChange('P', -1)
 })
