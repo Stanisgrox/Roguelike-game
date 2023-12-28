@@ -201,9 +201,11 @@ function PlaceGoods (objectProps) {
 }
 
 //Перемещения
-function MovePlayer (direction) {
+function Move (direction, unit) {
     let shift = {x: 0, y: 0}
-    let coords = getCoordinates('P');
+    let coords = getCoordinates(unit);
+    const id = unit.split('.')[1];
+
     switch (direction) {
         case 'up': 
             shift.y = -1;
@@ -219,13 +221,13 @@ function MovePlayer (direction) {
         break;
     }
     let newCoords = {x: coords.x + shift.x, y: coords.y + shift.y};
-    if ((newCoords.x > FIELD_WIDTH || newCoords.x <0) || (newCoords.y > FIELD_HEIGHT || newCoords.y < 0)) return;
-    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E') return;
+    if ((newCoords.x > FIELD_WIDTH || newCoords.x <0) || (newCoords.y > FIELD_HEIGHT || newCoords.y < 0)) return false;
+    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E') return false;
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
-        removeUnit(newCoords.x, newCoords.y);
+        if (unit === 'P') removeUnit(newCoords.x, newCoords.y);
     }
     const HPBar = removeUnit(coords.x, coords.y);
-    const NewTile = spawnUnit(newCoords.x, newCoords.y, 'P');
+    const NewTile = spawnUnit(newCoords.x, newCoords.y, unit, id);
     NewTile.appendChild(HPBar);
 }
 
@@ -278,16 +280,16 @@ PlaceGoods (objectProps);
 document.addEventListener('keydown', (e) => {
     switch (e.code) {
         case 'KeyW':
-            MovePlayer('up');
+            Move('up', 'P');
         break;
         case 'KeyS':
-            MovePlayer('down');
+            Move('down', 'P');
         break;
         case 'KeyD':
-            MovePlayer('right');
+            Move('right', 'P');
         break;
         case 'KeyA':
-            MovePlayer('left');
+            Move('left', 'P');
         break
         case 'Space':
             attack('P')
