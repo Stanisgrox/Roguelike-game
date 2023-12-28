@@ -88,6 +88,14 @@ function getCoordinates (type, index) {
     }
 }
 
+function createHPBar (id, x, y) {
+    const HPBar = document.createElement('div');
+    HPBar.id = id?`HP_E.${id}` : 'HP_P';
+    HPBar.classList.add('health')
+    HPBar.style['width'] = `100%`;
+    document.getElementById(`${x}-${y}`).appendChild(HPBar);
+}
+
 //Генераторы и отрисовка
 
 function GenerateTiles () {
@@ -171,7 +179,8 @@ function PlaceGoods (objectProps) {
                     turns: 0,
                     attack: 1
                 });
-                document.getElementById(`${x}-${y}`).setAttribute('enemy-id', i)
+                document.getElementById(`${x}-${y}`).setAttribute('enemy-id', i);
+                createHPBar(i, x, y);
             }
 
             GameData[y][x] = element.tileValue === 'E'? element.tileValue + '.' + i : element.tileValue
