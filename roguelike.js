@@ -1,5 +1,9 @@
 const GameData = [];
-const Player = {};
+const Player = {
+    HP: 10,
+    maxHP: 10,
+    attack: 1
+};
 const Enemies = [];
 const GameField = document.getElementsByClassName('field')[0];
 
@@ -30,6 +34,10 @@ const objectProps = [
         amount: 2
     }
 ]
+
+const FIELD_WIDTH = 39;
+const FIELD_HEIGHT = 23;
+const TILE_SIZE = 30;
 
 //UTILITY FUNCTIONS
 function getRandomInt(min, max) {
@@ -83,9 +91,9 @@ function getCoordinates (type, index) {
 //Генераторы и отрисовка
 
 function GenerateTiles () {
-    for (let iy = 0; iy <= 23; iy++) {
+    for (let iy = 0; iy <= FIELD_HEIGHT; iy++) {
         GameData[iy] = [];
-        for (let ix = 0; ix <= 39; ix ++) {
+        for (let ix = 0; ix <= FIELD_WIDTH; ix ++) {
             GameData[iy][ix] = 'W';
             const tile = document.createElement('div');
             tile.id = `${ix}-${iy}`;
@@ -103,9 +111,9 @@ function GenerateRooms () {
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
-        let roomCoordinates = {x: getRandomInt(0,36), y: getRandomInt(0,20)}
-        for (let iy = 0; iy <= 23; iy++){
-            for (let ix = 0; ix <= 39; ix++){
+        let roomCoordinates = {x: getRandomInt(0,FIELD_WIDTH - 3), y: getRandomInt(0,FIELD_HEIGHT - 3)}
+        for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
+            for (let ix = 0; ix <= FIELD_WIDTH; ix++){
                 if (ix >= roomCoordinates.x && ix <= roomCoordinates.x + roomDimensions.x){
                     if (iy >= roomCoordinates.y && iy <= roomCoordinates.y + roomDimensions.y) {
                         removeWall(ix, iy)
@@ -121,23 +129,23 @@ function GeneratePasses () {
     let passessCoord = [];
 
     for (let i = 1; i <= passesNumber.vertical; i++) {
-        let coordinate = getRandomInt(1,38);
+        let coordinate = getRandomInt(1,FIELD_WIDTH - 1);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
-            coordinate = getRandomInt(1,38)
+            coordinate = getRandomInt(1,FIELD_WIDTH - 1)
         }
         passessCoord.push(coordinate);
-        for (let iy = 0; iy <= 23; iy++) {
+        for (let iy = 0; iy <= FIELD_HEIGHT; iy++) {
             removeWall(coordinate, iy)
         }
     }
     passessCoord = [];
     for (let i = 1; i <= passesNumber.horizontal; i++) {
-        let coordinate = getRandomInt(1,22);
+        let coordinate = getRandomInt(1, FIELD_HEIGHT - 1);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
-            coordinate = getRandomInt(1,22)
+            coordinate = getRandomInt(1,FIELD_HEIGHT - 1)
         }
         passessCoord.push(coordinate);
-        for (let ix = 0; ix <= 39; ix++) {
+        for (let ix = 0; ix <= FIELD_WIDTH; ix++) {
             removeWall(ix, coordinate)
         }
     }
@@ -146,20 +154,22 @@ function GeneratePasses () {
 function PlaceGoods (objectProps) {
     objectProps.forEach(element => {
         for (let i = 1; i <= element.amount; i++) {
-            let x = getRandomInt(0, 39);
-            let y = getRandomInt(0, 23);
+            let x = getRandomInt(0, FIELD_WIDTH);
+            let y = getRandomInt(0, FIELD_HEIGHT);
             while (GameData[y][x] != 'R'){
-                x = getRandomInt(0, 39);
-                y = getRandomInt(0, 23); 
+                x = getRandomInt(0, FIELD_WIDTH);
+                y = getRandomInt(0, FIELD_HEIGHT); 
             }
             document.getElementById(`${x}-${y}`).classList.add(element.tileClass);
 
             if (element.tileValue === 'E') {
                 Enemies.push({
-                    hp: 10,
+                    maxHP: 6,
+                    HP: 6,
                     id: i,
                     direction: undefined,
-                    turns: 0
+                    turns: 0,
+                    attack: 1
                 });
                 document.getElementById(`${x}-${y}`).setAttribute('enemy-id', i)
             }
@@ -188,7 +198,7 @@ function MovePlayer (direction) {
         break;
     }
     let newCoords = {x: coords.x + shift.x, y: coords.y + shift.y};
-    if ((newCoords.x > 39 || newCoords.x <0) || (newCoords.y > 23 || newCoords.y < 0)) return;
+    if ((newCoords.x > FIELD_WIDTH || newCoords.x <0) || (newCoords.y > FIELD_HEIGHT || newCoords.y < 0)) return;
     if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E') return;
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
         removeUnit(newCoords.x, newCoords.y);
