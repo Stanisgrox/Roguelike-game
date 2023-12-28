@@ -272,10 +272,17 @@ function HPChange (target, amount) {
     }
 }
 
-GenerateTiles();
-GenerateRooms();
-GeneratePasses();
-PlaceGoods (objectProps);
+function gameLoop () {
+    console.log('tick');
+
+    Enemies.forEach((enemy) => {
+        
+    });
+
+    setTimeout(() => gameLoop(), 500);
+}
+
+
 
 document.addEventListener('keydown', (e) => {
     switch (e.code) {
@@ -297,9 +304,9 @@ document.addEventListener('keydown', (e) => {
     }
 })
 
-document.addEventListener('click', (e) => {
-    let x = Number(e.target.id.split('-')[0]);
-    let y = Number(e.target.id.split('-')[1]);
-    console.log(getCoordinates('E.8'));
-    HPChange('P', -1)
-})
+
+GenerateTiles();
+GenerateRooms();
+GeneratePasses();
+PlaceGoods (objectProps);
+gameLoop();
