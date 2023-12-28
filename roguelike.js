@@ -253,10 +253,12 @@ function HPChange (target, amount) {
     const object = target === 'P'? Player : Enemies.filter((enemy) => enemy.id === Number(id))[0];
 
     object.HP = object.HP + amount;
+    const unit = getCoordinates(target);
+    const HPBar = document.getElementById(`${unit.x}-${unit.y}`).firstChild;
+    HPBar.style['width'] = `${object.HP / object.maxHP * 100}%`;
 
     if (object.HP <= 0) {
         Enemies = Enemies.filter((enemy) => enemy.id != id);
-        const unit = getCoordinates(target);
         removeUnit(unit.x, unit.y);
     }
 }
