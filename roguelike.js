@@ -54,10 +54,17 @@ function removeUnit (x, y) {
     if (prevTile === "R" || prevTile === "W") return;
     GameData[y][x] = "R";
     const objectData = objectProps.find(x => x.tileValue === prevTile);
-    document.getElementById(`${x}-${y}`).classList.remove(objectData.tileClass);
+    const tile = document.getElementById(`${x}-${y}`);
+    tile.classList.remove(objectData.tileClass);
 
     if (objectData.tileClass === 'tileE') {
-        document.getElementById(`${x}-${y}`).removeAttribute('enemy-id')
+        tile.removeAttribute('enemy-id')
+    }
+
+    if (tile.lastChild) {
+        const HPBar = tile.lastChild;
+        tile.removeChild(HPBar);
+        return HPBar;
     }
 }
 
@@ -65,11 +72,13 @@ function spawnUnit (x, y, type, id) {
     if (id) GameData[y][x] = type + '.' + id;
     else GameData[y][x] = type;
     const objectData = objectProps.find(x => x.tileValue === type);
-    document.getElementById(`${x}-${y}`).classList.add(objectData.tileClass);
+    const tile = document.getElementById(`${x}-${y}`)
+    tile.classList.add(objectData.tileClass);
 
     if (type === 'E' && id) {
-        document.getElementById(`${x}-${y}`).setAttribute('enemy-id', id)
+        tile.setAttribute('enemy-id', id)
     }
+    return tile;
 }
 
 function getCoordinates (type, index) {
@@ -168,7 +177,8 @@ function PlaceGoods (objectProps) {
                 x = getRandomInt(0, FIELD_WIDTH);
                 y = getRandomInt(0, FIELD_HEIGHT); 
             }
-            document.getElementById(`${x}-${y}`).classList.add(element.tileClass);
+            const tile = document.getElementById(`${x}-${y}`)
+            tile.classList.add(element.tileClass);
 
             if (element.tileValue === 'E') {
                 Enemies.push({
@@ -179,9 +189,10 @@ function PlaceGoods (objectProps) {
                     turns: 0,
                     attack: 1
                 });
-                document.getElementById(`${x}-${y}`).setAttribute('enemy-id', i);
-                createHPBar(i, x, y);
+                tile.setAttribute('enemy-id', i);
             }
+
+            if (element.tileValue === 'E' || element.tileValue === 'P') createHPBar(i, x, y);
 
             GameData[y][x] = element.tileValue === 'E'? element.tileValue + '.' + i : element.tileValue
         }
@@ -212,8 +223,9 @@ function MovePlayer (direction) {
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
         removeUnit(newCoords.x, newCoords.y);
     }
-    removeUnit(coords.x, coords.y);
-    spawnUnit(newCoords.x, newCoords.y, 'P');
+    const HPBar = removeUnit(coords.x, coords.y);
+    const NewTile = spawnUnit(newCoords.x, newCoords.y, 'P');
+    NewTile.appendChild(HPBar);
 }
 
 // Атака
