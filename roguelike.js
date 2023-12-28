@@ -4,8 +4,9 @@ const Player = {
     maxHP: 10,
     attack: 1
 };
-var Enemies = [];
 const GameField = document.getElementsByClassName('field')[0];
+var Enemies = [];
+var playerCom = '';
 var GameActive = true;
 
 //CONFIG
@@ -248,6 +249,7 @@ function attack (initiator) {
     }
 
     targets.forEach(target => HPChange(target, -1));
+    if (targets.includes('P')) return true;
 }
 
 function HPChange (target, amount) {
@@ -274,9 +276,15 @@ function HPChange (target, amount) {
 
 function gameLoop () {
     console.log('tick');
+    if (playerCom != ''){
+        if (playerCom === 'atk') attack('P');
+        else Move(playerCom, 'P');
+        playerCom = '';
+    }
+
 
     Enemies.forEach((enemy) => {
-        
+        attack(`E.${enemy.id}`);
     });
 
     setTimeout(() => gameLoop(), 500);
@@ -287,19 +295,19 @@ function gameLoop () {
 document.addEventListener('keydown', (e) => {
     switch (e.code) {
         case 'KeyW':
-            Move('up', 'P');
+            playerCom = 'up';
         break;
         case 'KeyS':
-            Move('down', 'P');
+            playerCom = 'down'
         break;
         case 'KeyD':
-            Move('right', 'P');
+            playerCom = 'right';
         break;
         case 'KeyA':
-            Move('left', 'P');
+            playerCom = 'left';
         break
         case 'Space':
-            attack('P')
+            playerCom = 'atk';
         break;
     }
 })
