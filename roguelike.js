@@ -42,7 +42,7 @@ function removeWall (x, y) {
 }
 
 function removeUnit (x, y) {
-    const prevTile = GameData[y][x];
+    const prevTile = GameData[y][x].charAt(0);
     if (prevTile === "R" || prevTile === "W") return;
     GameData[y][x] = "R";
     const objectData = objectProps.find(x => x.tileValue === prevTile);
@@ -54,7 +54,8 @@ function removeUnit (x, y) {
 }
 
 function spawnUnit (x, y, type, id) {
-    GameData[y][x] = type;
+    if (id) GameData[y][x] = type + '.' + id;
+    else GameData[y][x] = type;
     const objectData = objectProps.find(x => x.tileValue === type);
     document.getElementById(`${x}-${y}`).classList.add(objectData.tileClass);
 
@@ -151,7 +152,6 @@ function PlaceGoods (objectProps) {
                 x = getRandomInt(0, 39);
                 y = getRandomInt(0, 23); 
             }
-            GameData[y][x] = element.tileValue;
             document.getElementById(`${x}-${y}`).classList.add(element.tileClass);
 
             if (element.tileValue === 'E') {
@@ -163,6 +163,8 @@ function PlaceGoods (objectProps) {
                 });
                 document.getElementById(`${x}-${y}`).setAttribute('enemy-id', i)
             }
+
+            GameData[y][x] = element.tileValue === 'E'? element.tileValue + '.' + i : element.tileValue
         }
     });
 }
@@ -187,7 +189,7 @@ function MovePlayer (direction) {
     }
     let newCoords = {x: coords.x + shift.x, y: coords.y + shift.y};
     if ((newCoords.x > 39 || newCoords.x <0) || (newCoords.y > 23 || newCoords.y < 0)) return;
-    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x] === 'E') return;
+    if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E') return;
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
         removeUnit(newCoords.x, newCoords.y);
     }
@@ -195,11 +197,15 @@ function MovePlayer (direction) {
     spawnUnit(newCoords.x, newCoords.y, 'P');
 }
 
+// Атака
+function attack () {
+
+}
+
 GenerateTiles();
 GenerateRooms();
 GeneratePasses();
 PlaceGoods (objectProps);
-
 
 document.addEventListener('keydown', (e) => {
     switch (e.code) {
@@ -219,11 +225,10 @@ document.addEventListener('keydown', (e) => {
             console.log('attack');
         break;
     }
-    console.log(Enemies)
 })
 
 document.addEventListener('click', (e) => {
     let x = Number(e.target.id.split('-')[0]);
     let y = Number(e.target.id.split('-')[1]);
-    removeUnit(x,y)
+    removeUnit(x,y);
 })
