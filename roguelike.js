@@ -131,8 +131,8 @@ function GenerateRooms () {
     let verticalAllowed = [];
 
     for (let i = 0; i <= roomNumber; i++) {
-        let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
-        let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)}
+        let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)};
+        let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)};
 
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
             for (let ix = 0; ix <= FIELD_WIDTH; ix++){
