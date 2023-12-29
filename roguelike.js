@@ -134,21 +134,13 @@ function GenerateRooms () {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
         let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)}
 
-        for (let f = roomCoordinates.y; f <= roomCoordinates.y + roomDimensions.y; f++) {
-            if (horizontalAllowed.find(e => e === f)) continue;
-            horizontalAllowed.push(f);
-        }
-
-        for (let f = roomCoordinates.x; f <= roomCoordinates.x + roomDimensions.x; f++) {
-            if (verticalAllowed.find(e => e === f)) continue;
-            verticalAllowed.push(f);
-        }
-
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
             for (let ix = 0; ix <= FIELD_WIDTH; ix++){
                 if (ix >= roomCoordinates.x && ix <= roomCoordinates.x + roomDimensions.x){
                     if (iy >= roomCoordinates.y && iy <= roomCoordinates.y + roomDimensions.y) {
-                        removeWall(ix, iy)
+                        removeWall(ix, iy);
+                        if (!horizontalAllowed.find(e => e === iy)) horizontalAllowed.push(iy);
+                        if (!verticalAllowed.find(e => e === ix)) verticalAllowed.push(ix);;
                     }
                 }
             }
