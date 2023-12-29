@@ -231,6 +231,7 @@ function Move (direction, unit) {
     const HPBar = removeUnit(coords.x, coords.y);
     const NewTile = spawnUnit(newCoords.x, newCoords.y, type, id);
     NewTile.appendChild(HPBar);
+    return true;
 }
 
 // Атака и изменение характеристик
@@ -277,8 +278,10 @@ function HPChange (target, amount) {
     }
 }
 
+
+// Главная петля
 function gameLoop () {
-    console.log('tick');
+
     if (playerCom != ''){
         if (playerCom === 'atk') attack('P');
         else Move(playerCom, 'P');
@@ -290,8 +293,9 @@ function gameLoop () {
         const playerAround = attack(`E.${enemy.id}`);
         if (!playerAround) {
             if (enemy.direction && enemy.turns > 0) {
-                Move(enemy.direction, `E.${enemy.id}`);
+                const movementProgress = Move(enemy.direction, `E.${enemy.id}`);
                 enemy.turns = enemy.turns - 1;
+                if (!movementProgress) enemy.turns = 0;
             } else {
                 enemy.turns = getRandomInt(1, 6);
                 const direction = getRandomInt(1,4);
@@ -316,8 +320,7 @@ function gameLoop () {
     setTimeout(() => gameLoop(), 500);
 }
 
-
-
+//Регистрация взаимодействий
 document.addEventListener('keydown', (e) => {
     switch (e.code) {
         case 'KeyW':
@@ -338,9 +341,11 @@ document.addEventListener('keydown', (e) => {
     }
 })
 
-
+// Инициализация поля
 GenerateTiles();
 GenerateRooms();
 GeneratePasses();
 PlaceGoods (objectProps);
+
+//Запуск петли
 gameLoop();
