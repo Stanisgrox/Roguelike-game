@@ -160,22 +160,22 @@ function GeneratePasses (horizontalAllowed, verticalAllowed) {
     for (let i = 1; i <= passesNumber.vertical; i++) {
         let coordinate = getRandomInt(3, FIELD_WIDTH - 3);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !verticalAllowed.includes(coordinate)) {
-            coordinate = getRandomInt(3, FIELD_WIDTH - 3)
+            coordinate = getRandomInt(3, FIELD_WIDTH - 3);
         }
         passessCoord.push(coordinate);
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++) {
-            removeWall(coordinate, iy)
+            removeWall(coordinate, iy);
         }
     }
     passessCoord = [];
     for (let i = 1; i <= passesNumber.horizontal; i++) {
         let coordinate = getRandomInt(3, FIELD_HEIGHT - 3);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !horizontalAllowed.includes(coordinate)) {
-            coordinate = getRandomInt(3, FIELD_HEIGHT - 3)
+            coordinate = getRandomInt(3, FIELD_HEIGHT - 3);
         }
         passessCoord.push(coordinate);
         for (let ix = 0; ix <= FIELD_WIDTH; ix++) {
-            removeWall(ix, coordinate)
+            removeWall(ix, coordinate);
         }
     }
 }
