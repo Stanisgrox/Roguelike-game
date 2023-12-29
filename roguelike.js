@@ -130,7 +130,7 @@ function GenerateRooms () {
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
-        let roomCoordinates = {x: getRandomInt(0, FIELD_WIDTH - roomDimensions.x), y: getRandomInt(0, FIELD_HEIGHT - roomDimensions.y)}
+        let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)}
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
             for (let ix = 0; ix <= FIELD_WIDTH; ix++){
                 if (ix >= roomCoordinates.x && ix <= roomCoordinates.x + roomDimensions.x){
@@ -148,9 +148,9 @@ function GeneratePasses () {
     let passessCoord = [];
 
     for (let i = 1; i <= passesNumber.vertical; i++) {
-        let coordinate = getRandomInt(2,FIELD_WIDTH - 3);
+        let coordinate = getRandomInt(3, FIELD_WIDTH - 3);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
-            coordinate = getRandomInt(2, FIELD_WIDTH - 3)
+            coordinate = getRandomInt(3, FIELD_WIDTH - 3)
         }
         passessCoord.push(coordinate);
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++) {
@@ -159,9 +159,9 @@ function GeneratePasses () {
     }
     passessCoord = [];
     for (let i = 1; i <= passesNumber.horizontal; i++) {
-        let coordinate = getRandomInt(2, FIELD_HEIGHT - 3);
+        let coordinate = getRandomInt(3, FIELD_HEIGHT - 3);
         while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
-            coordinate = getRandomInt(2, FIELD_HEIGHT - 3)
+            coordinate = getRandomInt(3, FIELD_HEIGHT - 3)
         }
         passessCoord.push(coordinate);
         for (let ix = 0; ix <= FIELD_WIDTH; ix++) {
@@ -226,7 +226,11 @@ function Move (direction, unit) {
     if ((newCoords.x > FIELD_WIDTH || newCoords.x <0) || (newCoords.y > FIELD_HEIGHT || newCoords.y < 0)) return false;
     if (GameData[newCoords.y][newCoords.x] === 'W' || GameData[newCoords.y][newCoords.x].charAt(0) === 'E' || GameData[newCoords.y][newCoords.x] === 'P') return false;
     if (GameData[newCoords.y][newCoords.x] === 'H' || GameData[newCoords.y][newCoords.x] === 'S') {
-        if (type === 'P') removeUnit(newCoords.x, newCoords.y);
+        if (type === 'P') {
+            if (GameData[newCoords.y][newCoords.x] === 'S') ATTChange(1);
+            if (GameData[newCoords.y][newCoords.x] === 'H') HPChange('P', 5);
+            removeUnit(newCoords.x, newCoords.y)
+        } else return false;
     }
     const HPBar = removeUnit(coords.x, coords.y);
     const NewTile = spawnUnit(newCoords.x, newCoords.y, type, id);
@@ -235,9 +239,10 @@ function Move (direction, unit) {
 }
 
 // Атака и изменение характеристик
-function attack (initiator) {
+function attack (initiator, damage) {
     const coordinates = getCoordinates(initiator);
     const targets = [];
+    if (!damage) damage = 1;
 
     for (let iy = coordinates.y - 1; iy <= coordinates.y + 1; iy ++) {
         for (let ix = coordinates.x - 1; ix <= coordinates.x + 1; ix++) {
@@ -251,7 +256,7 @@ function attack (initiator) {
         }
     }
 
-    targets.forEach(target => HPChange(target, -1));
+    targets.forEach(target => HPChange(target, -damage));
     if (targets.includes('P')) return true;
     else return false;
 }
@@ -262,6 +267,8 @@ function HPChange (target, amount) {
     const object = target === 'P'? Player : Enemies.filter((enemy) => enemy.id === Number(id))[0];
 
     object.HP = object.HP + amount;
+    if (object.HP > object.maxHP) object.HP = object.maxHP;
+
     const unit = getCoordinates(target);
     const HPBar = document.getElementById(`${unit.x}-${unit.y}`).firstChild;
     HPBar.style['width'] = `${object.HP / object.maxHP * 100}%`;
@@ -278,12 +285,15 @@ function HPChange (target, amount) {
     }
 }
 
+function ATTChange (amount) {
+    Player.attack = Player.attack + amount;
+}
 
 // Главная петля
 function gameLoop () {
 
     if (playerCom != ''){
-        if (playerCom === 'atk') attack('P');
+        if (playerCom === 'atk') attack('P', Player.attack);
         else Move(playerCom, 'P');
         playerCom = '';
     }
