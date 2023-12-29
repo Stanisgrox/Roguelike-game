@@ -127,10 +127,17 @@ function GenerateTiles () {
 
 function GenerateRooms () {
     let roomNumber = getRandomInt(5,10);
+    let horizontalAllowed = [];
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
         let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)}
+
+        for (let f = roomCoordinates.y; f <= roomCoordinates.y + roomDimensions.y; f++) {
+            if (horizontalAllowed.find(e => e === f)) continue;
+            horizontalAllowed.push(f);
+        }
+
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
             for (let ix = 0; ix <= FIELD_WIDTH; ix++){
                 if (ix >= roomCoordinates.x && ix <= roomCoordinates.x + roomDimensions.x){
@@ -141,9 +148,11 @@ function GenerateRooms () {
             }
         }
     }
+
+    return horizontalAllowed;
 }
 
-function GeneratePasses () {
+function GeneratePasses (horizontalAllowed) {
     let passesNumber = {horizontal: getRandomInt(3,5), vertical: getRandomInt(3,5)}
     let passessCoord = [];
 
@@ -160,7 +169,7 @@ function GeneratePasses () {
     passessCoord = [];
     for (let i = 1; i <= passesNumber.horizontal; i++) {
         let coordinate = getRandomInt(3, FIELD_HEIGHT - 3);
-        while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
+        while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !horizontalAllowed.includes(coordinate)) {
             coordinate = getRandomInt(3, FIELD_HEIGHT - 3)
         }
         passessCoord.push(coordinate);
@@ -353,8 +362,8 @@ document.addEventListener('keydown', (e) => {
 
 // Инициализация поля
 GenerateTiles();
-GenerateRooms();
-GeneratePasses();
+const roomsH = GenerateRooms();
+GeneratePasses(roomsH);
 PlaceGoods (objectProps);
 
 //Запуск петли
