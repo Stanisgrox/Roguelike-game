@@ -128,6 +128,7 @@ function GenerateTiles () {
 function GenerateRooms () {
     let roomNumber = getRandomInt(5,10);
     let horizontalAllowed = [];
+    let verticalAllowed = [];
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)}
@@ -136,6 +137,11 @@ function GenerateRooms () {
         for (let f = roomCoordinates.y; f <= roomCoordinates.y + roomDimensions.y; f++) {
             if (horizontalAllowed.find(e => e === f)) continue;
             horizontalAllowed.push(f);
+        }
+
+        for (let f = roomCoordinates.x; f <= roomCoordinates.x + roomDimensions.x; f++) {
+            if (verticalAllowed.find(e => e === f)) continue;
+            verticalAllowed.push(f);
         }
 
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
@@ -149,16 +155,19 @@ function GenerateRooms () {
         }
     }
 
-    return horizontalAllowed;
+    return {
+        horizontalAllowed: horizontalAllowed,
+        verticalAllowed: verticalAllowed
+    };
 }
 
-function GeneratePasses (horizontalAllowed) {
+function GeneratePasses (horizontalAllowed, verticalAllowed) {
     let passesNumber = {horizontal: getRandomInt(3,5), vertical: getRandomInt(3,5)}
     let passessCoord = [];
 
     for (let i = 1; i <= passesNumber.vertical; i++) {
         let coordinate = getRandomInt(3, FIELD_WIDTH - 3);
-        while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1)) {
+        while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !verticalAllowed.includes(coordinate)) {
             coordinate = getRandomInt(3, FIELD_WIDTH - 3)
         }
         passessCoord.push(coordinate);
@@ -363,7 +372,7 @@ document.addEventListener('keydown', (e) => {
 // Инициализация поля
 GenerateTiles();
 const roomsH = GenerateRooms();
-GeneratePasses(roomsH);
+GeneratePasses(roomsH.horizontalAllowed, roomsH.verticalAllowed);
 PlaceGoods (objectProps);
 
 //Запуск петли
