@@ -241,6 +241,7 @@ function attack (initiator) {
     for (let iy = coordinates.y - 1; iy <= coordinates.y + 1; iy ++) {
         for (let ix = coordinates.x - 1; ix <= coordinates.x + 1; ix++) {
             if (ix > FIELD_WIDTH || iy > FIELD_HEIGHT) continue;
+            if (ix < 0 || iy < 0) continue;
             const target = GameData[iy][ix];
             if (target.charAt(0) != 'E' && target.charAt(0) != 'P') continue;
             if (target === initiator) continue;
@@ -286,8 +287,30 @@ function gameLoop () {
 
 
     Enemies.forEach((enemy) => {
-        attack(`E.${enemy.id}`);
-        //Move('right', `E.${enemy.id}`)
+        const playerAround = attack(`E.${enemy.id}`);
+        if (!playerAround) {
+            if (enemy.direction && enemy.turns > 0) {
+                Move(enemy.direction, `E.${enemy.id}`);
+                enemy.turns = enemy.turns - 1;
+            } else {
+                enemy.turns = getRandomInt(1, 6);
+                const direction = getRandomInt(1,4);
+                switch (direction) {
+                    case 1:
+                        enemy.direction = 'up';
+                    break;
+                    case 2:
+                        enemy.direction = 'down';
+                    break;
+                    case 3:
+                        enemy.direction = 'left';
+                    break;
+                    case 4:
+                        enemy.direction = 'right';
+                    break;
+                }
+            }
+        }
     });
 
     setTimeout(() => gameLoop(), 500);
