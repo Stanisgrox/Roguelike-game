@@ -129,10 +129,17 @@ function GenerateRooms () {
     let roomNumber = getRandomInt(5,10);
     let horizontalAllowed = [];
     let verticalAllowed = [];
+    let BanX = [0];
+    let BanY = [0];
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)};
         let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)};
+
+        while(BanX.includes(roomCoordinates.x) && BanY.includes(roomCoordinates.y)){
+            roomCoordinates.x = getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1);
+            roomCoordinates.y = getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1);
+        }
 
         for (let iy = 0; iy <= FIELD_HEIGHT; iy++){
             for (let ix = 0; ix <= FIELD_WIDTH; ix++){
@@ -140,11 +147,16 @@ function GenerateRooms () {
                     if (iy >= roomCoordinates.y && iy <= roomCoordinates.y + roomDimensions.y) {
                         removeWall(ix, iy);
                         if (!horizontalAllowed.find(e => e === iy)) horizontalAllowed.push(iy);
-                        if (!verticalAllowed.find(e => e === ix)) verticalAllowed.push(ix);;
+                        if (!verticalAllowed.find(e => e === ix)) verticalAllowed.push(ix);
+                        BanX.push(ix);
+                        BanY.push(iy);
                     }
                 }
             }
         }
+
+        BanX = [...new Set(BanX)];
+        BanY = [...new Set(BanY)];
     }
 
     return {
