@@ -157,9 +157,14 @@ function GeneratePasses (horizontalAllowed, verticalAllowed) {
     let passesNumber = {horizontal: getRandomInt(3,5), vertical: getRandomInt(3,5)}
     let passessCoord = [];
 
+    function passChecker (coordinate, allowedList) {
+        if (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !allowedList.includes(coordinate)) return true;
+        return false
+    }
+
     for (let i = 1; i <= passesNumber.vertical; i++) {
         let coordinate = getRandomInt(3, FIELD_WIDTH - 3);
-        while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !verticalAllowed.includes(coordinate)) {
+        while (passChecker(coordinate, verticalAllowed)) {
             coordinate = getRandomInt(3, FIELD_WIDTH - 3);
         }
         passessCoord.push(coordinate);
@@ -170,7 +175,7 @@ function GeneratePasses (horizontalAllowed, verticalAllowed) {
     passessCoord = [];
     for (let i = 1; i <= passesNumber.horizontal; i++) {
         let coordinate = getRandomInt(3, FIELD_HEIGHT - 3);
-        while (passessCoord.includes(coordinate) || passessCoord.includes(coordinate + 1) || passessCoord.includes(coordinate - 1) || !horizontalAllowed.includes(coordinate)) {
+        while (passChecker(coordinate, horizontalAllowed)) {
             coordinate = getRandomInt(3, FIELD_HEIGHT - 3);
         }
         passessCoord.push(coordinate);
