@@ -127,16 +127,19 @@ function GenerateTiles () {
 
 function GenerateRooms () {
     let roomNumber = getRandomInt(5,10);
-    let horizontalAllowed = [];
-    let verticalAllowed = [];
+    const horizontalAllowed = [];
+    const verticalAllowed = [];
     let BanX = [0];
     let BanY = [0];
+    const loopTime = FIELD_HEIGHT * FIELD_WIDTH;
+    let loopsElapsed = 0;
 
     for (let i = 0; i <= roomNumber; i++) {
         let roomDimensions = {x: getRandomInt(3,8), y: getRandomInt(3,8)};
         let roomCoordinates = {x: getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1), y: getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1)};
 
-        while(BanX.includes(roomCoordinates.x) && BanY.includes(roomCoordinates.y)){
+        while(BanX.includes(roomCoordinates.x) && BanY.includes(roomCoordinates.y) && loopsElapsed < loopTime){
+            loopsElapsed = loopsElapsed + 1;
             roomCoordinates.x = getRandomInt(1, FIELD_WIDTH - roomDimensions.x - 1);
             roomCoordinates.y = getRandomInt(1, FIELD_HEIGHT - roomDimensions.y - 1);
         }
@@ -148,8 +151,8 @@ function GenerateRooms () {
                         removeWall(ix, iy);
                         if (!horizontalAllowed.find(e => e === iy)) horizontalAllowed.push(iy);
                         if (!verticalAllowed.find(e => e === ix)) verticalAllowed.push(ix);
-                        BanX.push(ix);
-                        BanY.push(iy);
+                        BanX.push(ix - 1, ix, ix + 1);
+                        BanY.push(iy - 1, iy, iy + 1);
                     }
                 }
             }
@@ -158,6 +161,8 @@ function GenerateRooms () {
         BanX = [...new Set(BanX)];
         BanY = [...new Set(BanY)];
     }
+
+    console.log(loopsElapsed);
 
     return {
         horizontalAllowed: horizontalAllowed,
